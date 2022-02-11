@@ -113,8 +113,8 @@ gtbb_control <- function(alpha_min = 1e-8, alpha_max = 1e30, alpha = NULL,
 #' obj <- function(x) sum(A * x^2))/2
 #' grad <- function(x) A * x
 #' 
-#' generic_sg(x, obj, grad, quadratic = TRUE)
-gtbb <- function(x, obj, grad, p = generic_sg_control(), quadratic = FALSE, reltol = TRUE, info = FALSE){
+#' gtbb(x, obj, grad, quadratic = TRUE)
+gtbb <- function(x, obj, grad, p = gtbb_control(), quadratic = FALSE, reltol = TRUE, info = FALSE){
   
   # get params
   p <- do.call(gtbb_control, as.list(p))
@@ -122,6 +122,9 @@ gtbb <- function(x, obj, grad, p = generic_sg_control(), quadratic = FALSE, relt
   # define target function
   if(!is.function(p$target_option)){
     tau_fun <- target_gallery(p$target_option)
+  } else {
+    tau_fun <- p$target_option
+    p$target_option <- "new target"
   }
   
   # init f, gradient, alpha
