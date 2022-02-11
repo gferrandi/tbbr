@@ -4,3 +4,6 @@
 .Ruserdata
 .Rbuildignore
 tbbr.Rproj
+inst/doc
+/doc/
+/Meta/

@@ -1,0 +1,58 @@
+---
+title: "An R package for gradient methods with the TBB stepsize"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{tbbr-examples}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+require(tbbr)
+require(purrr)
+
+options(digits = 2)
+```
+
+```{r quad}
+# quadratic example
+a <- c(1:100)
+x <- c(100:1)
+
+obj <- function(x) 0.5*sum(a*x^2)
+grad <- function(x) a*x
+
+out <- gtbb(x, obj, grad, quadratic = TRUE, reltol = FALSE)
+out$last_iter
+```
+
+```{r quad and target}
+# create target function 
+tau_fun <- function(a,b,k) {10*b}
+p <- gtbb_control(target_option = tau_fun)
+out <- gtbb(x, obj, grad, p, quadratic = TRUE, reltol = FALSE)
+out$x
+out$last_iter
+```
+
+```{r try all}
+# try all stepsizes
+implemented <- c("cotan1_1", "cotan2_1", "cotan1_2", "cotan1_H", "cotanH_1", 
+                 "inv_bb2_2_01", "inv_bb2_100", "iter", "bb1", "bb2", "abb")
+
+exp <- function_gallery("2", 1000)
+x <- exp$x0
+obj <- exp$obj
+grad <- exp$grad
+
+choose_target <- function(target_option) gtbb_control(target_option = target_option)
+map_dfr(implemented, ~ gtbb(x, obj, grad, p = choose_target(.), quadratic = FALSE, reltol = TRUE)$last_iter)
+```
+

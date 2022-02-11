@@ -8,7 +8,7 @@ gtbb(
   x,
   obj,
   grad,
-  p = generic_sg_control(),
+  p = gtbb_control(),
   quadratic = FALSE,
   reltol = TRUE,
   info = FALSE
@@ -46,5 +46,5 @@ x <- rep(1:100)
 obj <- function(x) sum(A * x^2))/2
 grad <- function(x) A * x
 
-generic_sg(x, obj, grad, quadratic = TRUE)
+gtbb(x, obj, grad, quadratic = TRUE)
 }
