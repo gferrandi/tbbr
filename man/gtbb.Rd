@@ -43,7 +43,7 @@ It is endowed with the TBB stepsize, a Barzilai--Borwein like stepsize with an a
 A <- c(1:100)
 x <- rep(1:100)
 
-obj <- function(x) sum(A * x^2))/2
+obj <- function(x) sum(A * x^2)/2
 grad <- function(x) A * x
 
 gtbb(x, obj, grad, quadratic = TRUE)

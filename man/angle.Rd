@@ -17,6 +17,3 @@ angle between the two vectors in radiants
 \description{
 Angle between two vectors
 }
-\examples{
-angle(c(1,0,0), c(0,1,1))
-}

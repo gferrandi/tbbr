@@ -4,9 +4,6 @@
 #' @param x vector
 #'
 #' @return L2 norm of a vector
-#'
-#' @examples
-#' norm2(c(1,2,3))
 norm2 <- function(x) {sqrt(sum(x^2))}
 
 # angle -------------------------------------------------------------------
@@ -16,9 +13,6 @@ norm2 <- function(x) {sqrt(sum(x^2))}
 #' @param b second vector
 #'
 #' @return angle between the two vectors in radiants
-#'
-#' @examples
-#' angle(c(1,0,0), c(0,1,1))
 angle <- function(a,b){
   a <- a/norm2(a); b <- b/norm2(b)
   asin(min(1, norm2(a- sum(a*b)*b)))
@@ -110,7 +104,7 @@ gtbb_control <- function(alpha_min = 1e-8, alpha_max = 1e30, alpha = NULL,
 #' A <- c(1:100)
 #' x <- rep(1:100)
 #' 
-#' obj <- function(x) sum(A * x^2))/2
+#' obj <- function(x) sum(A * x^2)/2
 #' grad <- function(x) A * x
 #' 
 #' gtbb(x, obj, grad, quadratic = TRUE)

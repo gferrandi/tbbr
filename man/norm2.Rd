@@ -15,6 +15,3 @@ L2 norm of a vector
 \description{
 L2 norm of a vector
 }
-\examples{
-norm2(c(1,2,3))
-}
