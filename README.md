@@ -12,5 +12,5 @@ To include the vignette, use
 Once the package is installed, the vignette can be visualized with
 ```
 library(tbbr)
-vignettes("tbbr-examples")
+vignette("tbbr-examples")
 ```
