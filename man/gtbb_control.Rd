@@ -44,6 +44,17 @@ list with parameters for the
 \description{
 Parameters of global TBB
 }
+\details{
+Other stepsizes:
+\tabular{ll}{
+Target \tab Description \cr
+bb1 \tab Barzilai -- Borwein 1 \cr
+bb2 \tab Barzilai -- Borwein 2 \cr
+abb \tab Adaptive BB with threshold 0.8 \cr
+homo_bb \tab Homogeneous BB \cr
+homo_abb \tab Adaptive homo BB with threshold 0.8 \cr
+}
+}
 \examples{
 gtbb_control()
 }

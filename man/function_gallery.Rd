@@ -21,7 +21,20 @@ Gallery of unconstrained optimization problems from different sources. They are 
 e.g.,
 \tabular{lll}{
 Name \tab Function \tab Reference \cr
-2 \tab Strictly convex 2 \tab Raydan 1997\cr
+1 \tab Strictly Convex 1 \tab Raydan 1997 \cr
+2 \tab Strictly convex 2 \tab Raydan 1997 \cr
+3 \tab Brown almost linear \tab Raydan 1997 \cr
+4 \tab Trigonometric \tab Raydan 1997 \cr
+5 \tab Broyden tridiagonal \tab Raydan 1997 \cr
+7 \tab Extended Rosenbrock \tab Raydan 1997 \cr
+8 \tab Penalty 1 \tab Raydan 1997 \cr
+10 \tab Variably dimensioned \tab Raydan 1997 \cr
+11 \tab Extended Powell \tab Raydan 1997 \cr
+12 \tab Generalized Rosenbrock \tab Raydan 1997 \cr
+hager \tab Hager \tab Andrei 2008 \cr
+gentridiag1 \tab Generalized tridiagonal 1 \tab Andrei 2008 \cr
+genWH \tab Generalized White and Holst \tab Andrei 2008 \cr
+diag5 \tab Diagonal 5 \tab Andrei 2008 \cr
 }
 }
 \examples{

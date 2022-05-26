@@ -24,9 +24,18 @@ angle <- function(a,b){
 #'
 #' @details e.g.,
 #' \tabular{ll}{
-#' Target \tab Description\cr 
+#' Target \tab Description \cr 
 #' cotan1_1 \tab cotangent step with $q=r=1$ \cr
+#' cotan1_2 \tab cotangent step with $q=1$ and $r=2$ \cr
+#' cotan2_1 \tab cotangent step with $q=2$ and $r=1$ \cr
+#' cotan1_H \tab cotangent step with $q=1$ and $r=0.5$ \cr
+#' cotanH_1 \tab cotangent step with $q=0.5$ and $r=1$ \cr
+#' inv_bb2_2_01 \tab positive target $2.01$*INV BB2 \cr
+#' inv_bb2_100 \tab positive target $100$*INV BB2 \cr
+#' iter \tab positive target $k$*INV BB2 k \cr
 #' }
+#' 
+#' @md
 #'
 #' @return function with three arguments: angle between $s_k$ and $y_k$, inverse BB2 $\|y_k\|^2/s_k^Ty_k$, number of iterations
 #' @export
@@ -36,7 +45,7 @@ angle <- function(a,b){
 target_gallery <- function(target_option){
   
   implemented <- c("cotan1_1", "cotan2_1", "cotan1_2", "cotan1_H", "cotanH_1", 
-                   "inv_bb2_2_01", "inv_bb2_100", "iter", "bb1", "bb2", "abb")
+                   "inv_bb2_2_01", "inv_bb2_100", "iter", "bb1", "bb2", "abb", "homo_bb", "homo_abb")
   
   if(!(target_option %in% implemented)) {
     stop(cat("Target option not implemented. Try\n", paste0(implemented, collapse = "\n")))
@@ -66,6 +75,18 @@ target_gallery <- function(target_option){
 #' @param iter_int_max maximum number of iterations for the backtracking, default = 100
 #' @param target_option string or function. See target_gallery for more details; default = "bb1"
 #' @param ... additional arguments (not needed at the moment)
+#'
+#' @details Other stepsizes:
+#' \tabular{ll}{
+#' Target \tab Description \cr 
+#' bb1 \tab Barzilai -- Borwein 1 \cr
+#' bb2 \tab Barzilai -- Borwein 2 \cr
+#' abb \tab Adaptive BB with threshold 0.8 \cr
+#' homo_bb \tab Homogeneous BB \cr
+#' homo_abb \tab Adaptive homo BB with threshold 0.8 \cr
+#' }
+#' 
+#' @md
 #'
 #' @return list with parameters for the 
 #' @export
@@ -180,6 +201,16 @@ gtbb <- function(x, obj, grad, p = gtbb_control(), quadratic = FALSE, reltol = T
         alpha <- sy/yy
       } else if(p$target_option == "abb"){
         if(cos(angle(g0, y))^2 < 0.8) alpha <- sy/yy else alpha <- -alpha*sng/p0y
+      } else if(p$target_option == "homo_bb"){
+        mu <- 0.5*(sng - yy/alpha^2 + sqrt((sng - yy/alpha^2)^2 + 4*(p0y/alpha)^2))
+        alpha <- -alpha*mu/p0y
+      } else if(p$target_option == "homo_abb"){
+        if(cos(angle(g0, y))^2 < 0.8){
+          mu <- 0.5*(sng - yy/alpha^2 + sqrt((sng - yy/alpha^2)^2 + 4*(p0y/alpha)^2))
+          alpha <- -alpha*mu/p0y
+        } else {
+          alpha <- -alpha*sng/p0y
+        }
       } else {
         tauk <- tau_fun(angle(g0, y),yy/sy,iter)
         alpha <- (sy-tauk*alpha^2*sng)/(yy-tauk*sy)  

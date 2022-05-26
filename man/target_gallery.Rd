@@ -18,8 +18,15 @@ Gallery of targets
 \details{
 e.g.,
 \tabular{ll}{
-Target \tab Description\cr
+Target \tab Description \cr
 cotan1_1 \tab cotangent step with $q=r=1$ \cr
+cotan1_2 \tab cotangent step with $q=1$ and $r=2$ \cr
+cotan2_1 \tab cotangent step with $q=2$ and $r=1$ \cr
+cotan1_H \tab cotangent step with $q=1$ and $r=0.5$ \cr
+cotanH_1 \tab cotangent step with $q=0.5$ and $r=1$ \cr
+inv_bb2_2_01 \tab positive target $2.01$*INV BB2 \cr
+inv_bb2_100 \tab positive target $100$*INV BB2 \cr
+iter \tab positive target $k$*INV BB2 k \cr
 }
 }
 \examples{
