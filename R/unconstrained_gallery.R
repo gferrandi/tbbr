@@ -76,35 +76,50 @@ function_gallery <- function(exp, n){
   exp_ls <- switch(exp,
                    "1" = list(x0    = c(1:n)/n,
                               obj   = function(x) {sum(exp(x) - x)},
-                              grad  = function(x) {exp(x) - 1}),
+                              grad  = function(x) {exp(x) - 1},
+                              sol_x = rep(0,n),
+                              sol_f = n,
+                              spectrum = function(x,n) exp(x)),
                    "2" = list(x0    = rep(1,n),
                               obj   = function(x) {sum(c(1:n)*(exp(x) - x))/10},
-                              grad  = function(x) {c(1:n)*(exp(x) - 1)/10}),
-                   "3" = list(x0    = rep(0.5, n),
+                              grad  = function(x) {c(1:n)*(exp(x) - 1)/10},
+                              sol_x = rep(0,n),
+                              sol_f = sum(c(1:n))/10,
+                              spectrum = function(x,n) c(1:n)*exp(x)/10),
+                   "3" = list(x0    = rep(0.5, n), # brown almost linear
                               obj   = function(x) {sum(define_f(x, n)^2)/2},
                               grad  = function(x) {f <- define_f(x, n)
                               out <- c(f[1:(n-1)],0) + sum(f[1:(n-1)])
                               tmp <- numeric(); for(i in 1:n) {tmp[i] <- prod(x[-i])}
                               out + f[n]*tmp
-                              }),
-                   "4" = list(x0    = rep(1,n)/n,
+                              },
+                              sol_x = c(rep(0,n-1), n+1),
+                              sol_f = 0),
+                   "4" = list(x0    = rep(1,n)/n, # trigonometric
                               obj   = function(x) {sum(define_f(x, n)^2)/2},
-                              grad  = function(x) {f <- define_f(x, n); sum(f)*sin(x) + f*(c(1:n)*sin(x) - cos(x))}),
-                   "5" = list(x0    = rep(-1,n),
+                              grad  = function(x) {f <- define_f(x, n); sum(f)*sin(x) + f*(c(1:n)*sin(x) - cos(x))},
+                              #sol_x = rep(0,n), # unknown
+                              sol_f = 0),
+                   "5" = list(x0    = rep(-1,n), # broyden tridiagonal
                               obj   = function(x) {sum(define_f(x, n)^2)/2},
-                              grad  = function(x) {f <- define_f(x, n); f*(3-4*x) - c(f[2:n], 0) - 2*c(0, f[1:(n-1)])}),
-                   "7" = list(x0    = rep(c(-1.2, 1), floor(n/2)),
+                              grad  = function(x) {f <- define_f(x, n); f*(3-4*x) - c(f[2:n], 0) - 2*c(0, f[1:(n-1)])},
+                              #sol_x = rep(0,n), # unknown
+                              sol_f = 0),
+                   "7" = list(x0    = rep(c(-1.2, 1), floor(n/2)), # extended Rosenbrock
                               obj   = function(x) {sum(define_f(x, n)^2)/2},
                               grad  = function(x) {f <- define_f(x, n); odd <- as.logical(1:n %% 2); g <- rep(0,n)
-                              g[odd] <- -20*f[odd]*x[odd] - f[!odd]; g[!odd] <- 10*f[odd]; g
-                              }),
-                   "8" = list(x0    = c(1:n),
+                              g[odd] <- -20*f[odd]*x[odd] - f[!odd]; g[!odd] <- 10*f[odd]; g},
+                              sol_x = rep(0, n),
+                              sol_f = 0),
+                   "8" = list(x0    = c(1:n), # penalty 1
                               obj   = function(x) {sum(define_f(x, n)^2)/2},
                               grad  = function(x) {f <- define_f(x, n); sqrt(1e-5)*f[1:n] + 2*f[n+1]*x}),
-                   "10" = list(x0   = 1 - c(1:n)/n,
+                   "10" = list(x0   = 1 - c(1:n)/n, # variably dimensioned
                                obj  = function(x) {sum(define_f(x, n)^2)/2},
-                               grad = function(x) {f <- define_f(x, n); f[1:n] + c(1:n)*f[n+1]*(1 + 2*f[n+2])}),
-                   "11" = list(x0   = rep(c(3,-1,0,1), floor(n/4)),
+                               grad = function(x) {f <- define_f(x, n); f[1:n] + c(1:n)*f[n+1]*(1 + 2*f[n+2])},
+                               sol_x = rep(1, n),
+                               sol_f = 0),
+                   "11" = list(x0   = rep(c(3,-1,0,1), floor(n/4)), # extended Powell
                                obj  = function(x) {sum(define_f(x, n)^2)/2},
                                grad = function(x) {f <- define_f(x, n); i <- 1:n %% 4; g <- rep(0,n)
                                g[i == 0] <- -2*sqrt(10)*f[i == 0]*(x[i == 1] - x[i == 0]) - sqrt(5)*f[i == 2]
@@ -112,7 +127,9 @@ function_gallery <- function(exp, n){
                                g[i == 2] <- 2*f[i == 3]*(x[i == 2] - 2*x[i == 3]) + 10*f[i == 1]
                                g[i == 1] <- 2*sqrt(10)*f[i == 0]*(x[i == 1] - x[i == 0]) + f[i == 1]
                                g
-                               }),
+                               },
+                               sol_x = rep(0, n),
+                               sol_f = 0),
                    "12" = list(x0    = rep(c(-1.2, 1), floor(n/2)), # n must be even (?)
                                obj   = function(x) {sum(100*(x[2:n] - x[1:(n-1)]^2)^2 + (1-x[1:(n-1)])^2)/2},
                                grad  = function(x) {g <- c(x[1:(n-1)]-1,0) 
