@@ -79,13 +79,13 @@ function_gallery <- function(exp, n){
                               grad  = function(x) {exp(x) - 1},
                               sol_x = rep(0,n),
                               sol_f = n,
-                              spectrum = function(x,n) exp(x)),
+                              spectrum = function(x) exp(x)),
                    "2" = list(x0    = rep(1,n),
                               obj   = function(x) {sum(c(1:n)*(exp(x) - x))/10},
                               grad  = function(x) {c(1:n)*(exp(x) - 1)/10},
                               sol_x = rep(0,n),
                               sol_f = sum(c(1:n))/10,
-                              spectrum = function(x,n) c(1:n)*exp(x)/10),
+                              spectrum = function(x) c(1:n)*exp(x)/10),
                    "3" = list(x0    = rep(0.5, n), # brown almost linear
                               obj   = function(x) {sum(define_f(x, n)^2)/2},
                               grad  = function(x) {f <- define_f(x, n)
