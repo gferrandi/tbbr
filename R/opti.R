@@ -66,10 +66,10 @@ target_gallery <- function(target_option){
          "bb1"           = function (p0y, yy, sy, sng, mem, t, a,k) -mem*sng/p0y,
          "bb2"           = function (p0y, yy, sy, sng, mem, t, a,k) sy/yy,
          "abb"           = function (p0y, yy, sy, sng, mem, t, a,k) if(cos(a)^2 < t) sy/yy else -mem*sng/p0y,
-         "fra1"          = function (p0y, yy, sy, sng, mem, t, a,k) if(cos(a)^2 < t) sy/yy else min(-mem[length(mem)]*sng/p0y, mem),
+         "fra1"          = function (p0y, yy, sy, sng, mem, t, a,k) if(cos(a)^2 < t) min(sy/yy, mem[-length(mem)]) else -mem[length(mem)]*sng/p0y,
          #"fra2"          = function (p0y, yy, sy, sng, mem, t, a,k) -cos(a)/sin(a),
-         "bon"           = function (p0y, yy, sy, sng, mem, t, a,k) if(cos(a)^2 < t) sy/yy else min(-mem[length(mem)]*sng/p0y, mem), #!!!
-         "homo_abb"      = function (p0y, yy, sy, sng, mem, t, a,k) if(cos(a)^2 < t) sy/yy else -0.5*mem*(sng - yy/mem^2 + sqrt((sng - yy/mem^2)^2 + 4*(p0y/mem)^2))/p0y,
+         "bon"           = function (p0y, yy, sy, sng, mem, t, a,k) if(cos(a)^2 < t) min(sy/yy, mem[-length(mem)]) else -mem[length(mem)]*sng/p0y, #!!!
+         "homo_abb"      = function (p0y, yy, sy, sng, mem, t, a,k) if(cos(a)^2 < t) -0.5*mem*(sng - yy/mem^2 + sqrt((sng - yy/mem^2)^2 + 4*(p0y/mem)^2))/p0y else -mem*sng/p0y,
          "homo_bb"       = function (p0y, yy, sy, sng, mem, t, a,k) -0.5*mem*(sng - yy/mem^2 + sqrt((sng - yy/mem^2)^2 + 4*(p0y/mem)^2))/p0y,
          "cotan1_1"      = function (p0y, yy, sy, sng, mem, t, a,k) (sy+(cos(a)/sin(a))*mem^2*sng)/(yy+(cos(a)/sin(a))*sy),
          "cotan2_1"      = function (p0y, yy, sy, sng, mem, t, a,k) (sy+(cos(a)^2/sin(a))*mem^2*sng)/(yy+(cos(a)^2/sin(a))*sy),
@@ -167,7 +167,12 @@ gtbb <- function(x, obj, grad, p = gtbb_control(), quadratic = FALSE, reltol = T
   # init f, gradient, alpha
   f <- obj(x); g <- grad(x)
   alpha <- if(is.null(p$alpha)) max(p$alpha_min, min(1/norm2(g), p$alpha_max)) else p$alpha
-  alpha0 <- alpha; mem <- NULL
+  alpha0 <- alpha; 
+  
+  if(p$target_option %in% c("fra1", "bon")){
+    bb2 <- target_gallery("bb2")
+    mem <- rep(Inf, p$M2); bb2_step0 <- alpha
+  } 
   
   # init objects to store previous iterations
   if(!quadratic){f_hist <- rep(f, p$M)}
@@ -216,14 +221,18 @@ gtbb <- function(x, obj, grad, p = gtbb_control(), quadratic = FALSE, reltol = T
       
       # update stepsize 
       p0y <- sum(g0*y); yy <- sum(y*y); sy <- -alpha*p0y; a <- angle(g0, y)
-      if(length(mem) < p$M2){
-        mem <- c(mem, alpha)
-      }else if(p$M2 == 1){
-        mem <- alpha
-      }else{
-        mem <- c(mem[2:p$M2], alpha)
+      
+      if(p$target_option %in% c("bon", "fra1")){
+        bb2_step <- bb2(p0y, yy, sy, sng, mem, p$t, a, iter)
+        if(!quadratic){
+          if(bb2_step > 0) {bb2_step0 <- bb2_step} else {bb2_step <- bb2_step0}
+          bb2_step <- max(p$alpha_min, min(bb2_step, p$alpha_max)) 
+        }
+        mem <- c(mem[2:p$M2], bb2_step)
+        alpha <- tau_fun(p0y, yy, sy, sng, c(mem,alpha), p$t, a, iter)
+      } else {
+        alpha <- tau_fun(p0y, yy, sy, sng, alpha, p$t, a, iter)
       }
-      alpha <- tau_fun(p0y, yy, sy, sng, mem, p$t, a, iter)
       
       # adaptive parameter for bonettini
       if(p$target_option == "bon"){
