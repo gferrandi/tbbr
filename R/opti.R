@@ -43,42 +43,47 @@ angle <- function(a,b){
 #' @examples
 #' target_gallery("cotan1_1")
 target_gallery <- function(target_option){
-  
-  # implemented <- c("cotan1_1", "cotan2_1", "cotan1_2", "cotan1_H", "cotanH_1", 
-  #                  "inv_bb2_2_01", "inv_bb2_100", "iter", "bb1", "bb2", "abb", "homo_bb", "homo_abb")
-  # 
-  # if(!(target_option %in% implemented)) {
-  #   stop(cat("Target option not implemented. Try\n", paste0(implemented, collapse = "\n")))
-  # }
-  # 
-  # switch(target_option,
-  #        "cotan1_1"      = function (a,b,k) -cos(a)/sin(a),
-  #        "cotan2_1"      = function (a,b,k) -(cos(a))^2/sin(a),
-  #        "cotan1_2"      = function (a,b,k) -cos(a)/(sin(a))^2,
-  #        "cotan1_H"      = function (a,b,k) -cos(a)/sqrt(sin(a)),
-  #        "cotanH_1"      = function (a,b,k) -sqrt(cos(a))/sin(a),
-  #        "inv_bb2_2_01"  = function (a,b,k) 2.01*b,
-  #        "inv_bb2_100"   = function (a,b,k) 100*b,
-  #        "iter"          = function (a,b,k) {if(k == 0) 0 else (k+1)*b})
-  
-  # mem = alpha for regular bb
   switch(target_option,
-         "bb1"           = function (p0y, yy, sy, sng, mem, t, a,k) -mem*sng/p0y,
-         "bb2"           = function (p0y, yy, sy, sng, mem, t, a,k) sy/yy,
-         "abb"           = function (p0y, yy, sy, sng, mem, t, a,k) if(cos(a)^2 < t) sy/yy else -mem*sng/p0y,
-         "fra1"          = function (p0y, yy, sy, sng, mem, t, a,k) if(cos(a)^2 < t) min(sy/yy, mem[-length(mem)]) else -mem[length(mem)]*sng/p0y,
-         #"fra2"          = function (p0y, yy, sy, sng, mem, t, a,k) -cos(a)/sin(a),
-         "bon"           = function (p0y, yy, sy, sng, mem, t, a,k) if(cos(a)^2 < t) min(sy/yy, mem[-length(mem)]) else -mem[length(mem)]*sng/p0y, #!!!
-         "homo_abb"      = function (p0y, yy, sy, sng, mem, t, a,k) if(cos(a)^2 < t) -0.5*mem*(sng - yy/mem^2 + sqrt((sng - yy/mem^2)^2 + 4*(p0y/mem)^2))/p0y else -mem*sng/p0y,
-         "homo_bb"       = function (p0y, yy, sy, sng, mem, t, a,k) -0.5*mem*(sng - yy/mem^2 + sqrt((sng - yy/mem^2)^2 + 4*(p0y/mem)^2))/p0y,
-         "cotan1_1"      = function (p0y, yy, sy, sng, mem, t, a,k) (sy+(cos(a)/sin(a))*mem^2*sng)/(yy+(cos(a)/sin(a))*sy),
-         "cotan2_1"      = function (p0y, yy, sy, sng, mem, t, a,k) (sy+(cos(a)^2/sin(a))*mem^2*sng)/(yy+(cos(a)^2/sin(a))*sy),
-         "cotan1_2"      = function (p0y, yy, sy, sng, mem, t, a,k) (sy+(cos(a)/sin(a)^2)*mem^2*sng)/(yy+(cos(a)/sin(a)^2)*sy),
-         "cotan1_H"      = function (p0y, yy, sy, sng, mem, t, a,k) (sy+(cos(a)/sqrt(sin(a)))*mem^2*sng)/(yy+(cos(a)/sqrt(sin(a)))*sy),
-         "cotanH_1"      = function (p0y, yy, sy, sng, mem, t, a,k) (sy+(sqrt(cos(a))/sin(a))*mem^2*sng)/(yy+(sqrt(cos(a))/sin(a))*sy),
-         "inv_bb2_2_01"  = function (p0y, yy, sy, sng, mem, t, a,k) (sy-2.01*(yy/sy)*mem^2*sng)/(yy-2.01*(yy/sy)*sy),
-         "inv_bb2_100"   = function (p0y, yy, sy, sng, mem, t, a,k) (sy-100*(yy/sy)*mem^2*sng)/(yy-100*(yy/sy)*sy),
-         "iter"          = function (p0y, yy, sy, sng, mem, t, a,k) {if(k == 0) sy/yy else (sy-(k+1)*(yy/sy)*mem^2*sng)/(yy-(k+1)*(yy/sy)*sy)}
+         "bb1"           = function (gy, y, sng, ng, alpha, iter) -alpha*sng/gy,
+         "bb2"           = function (gy, y, sng, ng, alpha, iter) {yy <- sum(y*y); -alpha*gy/yy},
+         "homo_abb"       = function (gy, y, sng, ng, alpha, iter) {
+           yy <- sum(y*y); cosa <- abs(gy)/(ng*sqrt(yy))
+           if(cosa^2 < 0.8) -0.5*alpha*(sng - yy/alpha^2 + sqrt((sng - yy/alpha^2)^2 + 4*(gy/alpha)^2))/gy else -alpha*sng/gy
+         },
+         "homo_bb"       = function (gy, y, sng, ng, alpha, iter) {
+           yy <- sum(y*y)
+           -0.5*alpha*(sng - yy/alpha^2 + sqrt((sng - yy/alpha^2)^2 + 4*(gy/alpha)^2))/gy
+         },
+         "cotan1_1"      = function (gy, y, sng, ng, alpha, iter) {
+           sy <- -alpha*gy; yy <- sum(y*y); cosa <- abs(gy)/(ng*sqrt(yy)); sina <- sqrt(1-min(cosa^2,1))
+           tau <- (cosa); tau0 <- (sina); (tau0*sy+tau*alpha^2*sng)/(tau0*yy+tau*sy)
+         },
+         "cotan2_1"      = function (gy, y, sng, ng, alpha, iter) {
+           sy <- -alpha*gy; yy <- sum(y*y); cosa <- abs(gy)/(ng*sqrt(yy)); sina <- sqrt(1-min(cosa^2,1))
+           tau <- (cosa)^2; tau0 <- (sina); (tau0*sy+tau*alpha^2*sng)/(tau0*yy+tau*sy)
+         },
+         "cotan1_2"      = function (gy, y, sng, ng, alpha, iter) {
+           sy <- -alpha*gy; yy <- sum(y*y); cosa <- abs(gy)/(ng*sqrt(yy)); sina <- sqrt(1-min(cosa^2,1))
+           tau <- (cosa); tau0 <- (sina)^2; (tau0*sy+tau*alpha^2*sng)/(tau0*yy+tau*sy)
+         },
+         "cotan1_H"      = function (gy, y, sng, ng, alpha, iter) {
+           sy <- -alpha*gy; yy <- sum(y*y); cosa <- abs(gy)/(ng*sqrt(yy)); sina <- sqrt(1-min(cosa^2,1))
+           tau <- (cosa); tau0 <- sqrt(sina); (tau0*sy+tau*alpha^2*sng)/(tau0*yy+tau*sy)
+         },
+         "cotanH_1"      = function (gy, y, sng, ng, alpha, iter) {
+           sy <- -alpha*gy; yy <- sum(y*y); cosa <- abs(gy)/(ng*sqrt(yy)); sina <- sqrt(1-min(cosa^2,1))
+           tau <- sqrt(cosa); tau0 <- (sina); (tau0*sy+tau*alpha^2*sng)/(tau0*yy+tau*sy)
+         },
+         "inv_bb2_2_01"  = function (gy, y, sng, ng, alpha, iter) {
+           yy <- sum(y*y); k <- 2.01; alpha*(gy/yy-k*sng/gy)/(k-1)
+         },
+         "inv_bb2_100"   = function (gy, y, sng, ng, alpha, iter) {
+           yy <- sum(y*y); k <- 100; alpha*(gy/yy-k*sng/gy)/(k-1)
+         },
+         "iter"          = function (gy, y, sng, ng, alpha, iter) {
+           yy <- sum(y*y); 
+           if(iter == 0) {-alpha*gy/yy} else {k <- iter+1; alpha*(gy/yy-k*sng/gy)/(k-1)}
+         }
   )
 }
 
@@ -113,13 +118,13 @@ target_gallery <- function(target_option){
 #'
 #' @examples
 #' gtbb_control()
-gtbb_control <- function(alpha_min = 1e-8, alpha_max = 1e30, alpha = NULL, 
-                               gamma = 1e-4, M = 5, tol = 1e-6, iter_max = 1e4, iter_int_max = 30, 
-                               target_option = "bb1", ...){
+gtbb_control <- function(alpha_min = 1e-30, alpha_max = 1e30, alpha = NULL, 
+                               gamma = 1e-4, M = 10, M2 = 5, tol = 1e-6, iter_max = 5e4, iter_int_max = 100, 
+                               target_option = "bb1", negstep = "normg", t = 0.8, ...){
   args <- list(...)
   c(list(alpha_min = alpha_min, alpha_max = alpha_max, alpha = alpha, 
-         gamma = gamma, M = M, tol = tol, iter_max = iter_max, iter_int_max = iter_int_max, 
-         target_option = target_option), args)
+         gamma = gamma, M = M, M2 = M2, tol = tol, iter_max = iter_max, iter_int_max = iter_int_max, 
+         target_option = target_option, negstep = negstep, t = t), args)
 }
 
 # unconstrained spectral gradient + nonmonotone ls ------------------------
@@ -155,34 +160,40 @@ gtbb <- function(x, obj, grad, p = gtbb_control(), quadratic = FALSE, reltol = T
   
   # get params
   p <- do.call(gtbb_control, as.list(p))
+  # p$M <- 10 # fix M
+  # p$alpha <- 1 # fix alpha
+  # p$iter_max <- 5e4 # fix iter max
   
   # define target function
-  if(!is.function(p$target_option)){
-    tau_fun <- target_gallery(p$target_option)
-  } else {
-    tau_fun <- p$target_option
-    p$target_option <- "new target"
+  if(!(p$target_option %in% c("bon", "fra1", "abb"))){
+    if(!is.function(p$target_option)){
+      tau_fun <- target_gallery(p$target_option)
+    } else {
+      tau_fun <- p$target_option
+      p$target_option <- "new target"
+    }
   }
   
-  # init f, gradient, alpha
-  f <- obj(x); g <- grad(x)
-  alpha <- if(is.null(p$alpha)) max(p$alpha_min, min(1/norm2(g), p$alpha_max)) else p$alpha
-  alpha0 <- alpha; 
+  # init params for ABB 
+  if(p$target_option == "bon") p$t <- 0.5
+  if(p$target_option == "abb") p$M2 <- 0
+  mem <- rep(Inf, p$M2) 
   
-  if(p$target_option %in% c("fra1", "bon")){
-    bb2 <- target_gallery("bb2")
-    mem <- rep(Inf, p$M2); bb2_step0 <- alpha
-  } 
+  # init f, gradient, alpha
+  f0 <- f <- obj(x); g <- grad(x)
+  alpha <- if(is.null(p$alpha)) max(p$alpha_min, min(1/norm2(g), p$alpha_max)) else p$alpha
+  x0norm <- sum(abs(x))
+  alpha0 <- alpha
   
   # init objects to store previous iterations
-  if(!quadratic){f_hist <- rep(f, p$M)}
+  if(!quadratic) f_hist <- rep(f, p$M)
   
   # save for reproducibility
   x0 <- x
   
   # tracking parameters
   if(info) alg_log <- NULL; 
-  nfe <- 1; const_step <- 0
+  nfe <- 1; const_step <- 0; gy <- NA
   
   # relative tolerance
   if(reltol) p$tol <- p$tol*norm2(g)
@@ -196,51 +207,58 @@ gtbb <- function(x, obj, grad, p = gtbb_control(), quadratic = FALSE, reltol = T
       
       # save info 
       if(info){
-        iter_info <- c(iter = iter, stop_criterion = ng, obj = f, alpha = alpha, nfe = nfe)
+        iter_info <- c(iter = iter, stop_criterion = ng, obj = f, alpha = alpha, nfe = nfe, gy = gy)
         alg_log <- rbind(alg_log, iter_info)
       }
       
       # is current point stationary? 
       if(ng < p$tol) break
       
-      # START BACKTRACKING 
+      # BACKTRACKING 
       if(!quadratic){
-        for (k in 1:p$iter_int_max) {
-          xnew <- x - alpha*g; f <- obj(xnew); nfe <- nfe + 1
-          if (f <= max(f_hist, na.rm = TRUE)-p$gamma*alpha*sng) break else alpha <- alpha/2
+        xnew <- x - alpha*g; f <- obj(xnew); nfe <- nfe + 1
+        fref <- max(f_hist, na.rm = TRUE)
+        while(f > fref - 1e-4*alpha*sng){
+          alpha <- alpha/2
+          stopifnot(alpha > p$alpha_min)
+          xnew <- x - alpha*g; f <- obj(xnew); nfe <- nfe + 1; 
         }
-        x <- xnew
-        f_hist<- if(p$M == 1) f else c(f_hist[2:p$M], f) # save previous function value
-        # END BACKTRACKING 
+        x <- xnew; f_hist <- c(f_hist, f); f_hist <- f_hist[-1] 
       } else {
-        x <- x -alpha*g; f <- obj(x); nfe <- nfe + 1
+        x <- x -alpha*g; f <- NA
       }
       
       # update gradients
       g0 <- g; g <- grad(x); y <- g - g0
       
       # update stepsize 
-      p0y <- sum(g0*y); yy <- sum(y*y); sy <- -alpha*p0y; a <- angle(g0, y)
+      gy <- sum(g0*y) 
       
-      if(p$target_option %in% c("bon", "fra1")){
-        bb2_step <- bb2(p0y, yy, sy, sng, mem, p$t, a, iter)
-        if(!quadratic){
-          if(bb2_step > 0) {bb2_step0 <- bb2_step} else {bb2_step <- bb2_step0}
-          bb2_step <- max(p$alpha_min, min(bb2_step, p$alpha_max)) 
+      if(gy < 0){ # -gy > 0
+        if(p$target_option %in% c("bon", "fra1", "abb")){
+          yy <- sum(y*y); tmp <- -alpha*gy/yy
+          #if(!quadratic & tmp < 0) tmp <- 1/max(1e-5, min(norm2(g), 1)) 
+          mem <- c(mem, tmp)
+          cosa <- abs(gy)/(ng*sqrt(yy))
+          if(cosa^2 < p$t) {
+            alpha <- min(mem)
+            if(p$target_option == "bon") p$t <- 0.9*p$t
+          } else {
+            alpha <- -alpha*sng/gy
+            if(p$target_option == "bon") p$t <- 1.1*p$t
+          }
+          mem <- mem[-1]
+        } else {
+          alpha <- tau_fun(gy, y, sng, ng, alpha, iter)
         }
-        mem <- c(mem[2:p$M2], bb2_step)
-        alpha <- tau_fun(p0y, yy, sy, sng, c(mem,alpha), p$t, a, iter)
+        #alpha0 <- alpha
       } else {
-        alpha <- tau_fun(p0y, yy, sy, sng, alpha, p$t, a, iter)
+        alpha <- 1/max(1e-5, min(norm2(g), 1)); const_step <- const_step + 1
+        #alpha <-alpha0; const_step <- const_step + 1
       }
       
-      # adaptive parameter for bonettini
-      if(p$target_option == "bon"){
-        p$t <- if(cos(a)^2 < p$t) 0.9*p$t else 1.1*p$t
-      }
       
       if(!quadratic){
-        if(alpha > 0) {alpha0 <- alpha} else {alpha <- alpha0; const_step <- const_step + 1}
         alpha <- max(p$alpha_min, min(alpha, p$alpha_max)) 
       }
     }
@@ -251,12 +269,14 @@ gtbb <- function(x, obj, grad, p = gtbb_control(), quadratic = FALSE, reltol = T
   }
   )
   
-  
   # prepare output
-  last_iter <- data.frame(id_algo = p$target_option, iter = iter, nfe = nfe, stop_criterion = ng, obj = f)
+  last_iter <- data.frame(id_algo = p$target_option, iter = iter, nfe = nfe, stop_criterion = ng, fstar = obj(x))
   last_iter$const_step <- const_step
+  last_iter$ctime <- difftime(Sys.time(), ctime, units = "secs") 
   last_iter$tol <- p$tol
-  last_iter$ctime <- as.numeric(Sys.time() - ctime)
+  last_iter$f0 <- f0
+  last_iter$x0 <- x0norm
+  last_iter$xstar <- sum(abs(x))
   
   if(info){
     alg_log <- as.data.frame(alg_log); rownames(alg_log) <- NULL

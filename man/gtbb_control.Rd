@@ -5,15 +5,18 @@
 \title{Parameters of global TBB}
 \usage{
 gtbb_control(
-  alpha_min = 1e-08,
+  alpha_min = 1e-30,
   alpha_max = 1e+30,
   alpha = NULL,
   gamma = 1e-04,
-  M = 5,
+  M = 10,
+  M2 = 5,
   tol = 1e-06,
-  iter_max = 10000,
-  iter_int_max = 30,
+  iter_max = 50000,
+  iter_int_max = 100,
   target_option = "bb1",
+  negstep = "normg",
+  t = 0.8,
   ...
 )
 }

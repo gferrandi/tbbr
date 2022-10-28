@@ -34,7 +34,22 @@ Name \tab Function \tab Reference \cr
 hager \tab Hager \tab Andrei 2008 \cr
 gentridiag1 \tab Generalized tridiagonal 1 \tab Andrei 2008 \cr
 genWH \tab Generalized White and Holst \tab Andrei 2008 \cr
-diag5 \tab Diagonal 5 \tab Andrei 2008 \cr
+griewank \tab Griewank \tab website \cr
+ext-freud-roth \tab Extended Freudenstein and Roth \tab Andrei 2008 \cr
+ext-WH \tab Extended White and Holst \tab Andrei 2008 \cr
+ext-beale \tab Extended Beale 5 \tab Andrei 2008 \cr
+pert-quad \tab Perturbed quadratic \tab Andrei 2008 \cr
+diag1 \tab Diagonal 1 \tab Andrei 2008 \cr
+diag2 \tab Diagonal 2 \tab Andrei 2008 \cr
+diag3 \tab Diagonal 3 \tab Andrei 2008 \cr
+ext-tridiag1 \tab Extended tridiagonal 1 \tab Andrei 2008 \cr
+ext-tet \tab Extended TET (three exponential terms) \tab Andrei 2008 \cr
+gen-tridiag2 \tab Generalized tridiagonal 2 \tab Andrei 2008 \cr
+diag4 \tab Diagonal 4 \tab Andrei 2008 \cr
+ext-himmelblau \tab Extended Himmelblau \tab Andrei 2008 \cr
+ext-psc1 \tab Extended PSC1 \tab Andrei 2008 \cr
+fh1 \tab Full Hessian FH1 \tab Andrei 2008 \cr
+fh2 \tab Full Hessian FH2 \tab Andrei 2008 \cr
 }
 }
 \examples{

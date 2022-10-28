@@ -21,6 +21,8 @@ require(purrr)
 options(digits = 2)
 ```
 
+# Quadratic objective function
+
 ```{r quad}
 # quadratic example
 a <- c(1:100)
@@ -33,19 +35,16 @@ out <- gtbb(x, obj, grad, quadratic = TRUE, reltol = FALSE)
 out$last_iter
 ```
 
-```{r quad and target}
-# create target function 
-tau_fun <- function(a,b,k) {10*b}
-p <- gtbb_control(target_option = tau_fun)
-out <- gtbb(x, obj, grad, p, quadratic = TRUE, reltol = FALSE)
-out$x
-out$last_iter
-```
+# Generic unconstrained optimization problem
+
+We consider the Strictly Convex 2 function in Raydan 1997.
+
+First, we test some stepsizes that do not require additional parameters.
 
 ```{r try all}
-# try all stepsizes
+# try some stepsizes
 implemented <- c("cotan1_1", "cotan2_1", "cotan1_2", "cotan1_H", "cotanH_1", 
-                 "inv_bb2_2_01", "inv_bb2_100", "iter", "bb1", "bb2", "abb")
+                 "inv_bb2_2_01", "inv_bb2_100", "iter", "bb1", "bb2")
 
 exp <- function_gallery("2", 1000)
 x <- exp$x0
@@ -54,5 +53,18 @@ grad <- exp$grad
 
 choose_target <- function(target_option) gtbb_control(target_option = target_option)
 map_dfr(implemented, ~ gtbb(x, obj, grad, p = choose_target(.), quadratic = FALSE, reltol = TRUE)$last_iter)
+```
+
+Next we illustrate how to set the parameters for ABBmin and ABBbon. Recall that ABBmin includes ABB when `M2 = 0`.
+
+```{r}
+# ABBmin with m = 5
+gtbb(x, obj, grad, p = gtbb_control(target_option = "fra1", M2 = 5, t = 0.8), quadratic = FALSE, reltol = TRUE)$last_iter
+```
+
+```{r}
+# ABBbon with m = 5
+gtbb(x, obj, grad, p = gtbb_control(target_option = "bon", M2 = 5), quadratic = FALSE, reltol = TRUE)$last_iter
+
 ```
 
